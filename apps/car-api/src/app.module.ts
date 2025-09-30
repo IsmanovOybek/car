@@ -4,18 +4,19 @@ import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver } from '@nestjs/apollo';
+import { AppResolver } from './app.resolver';
 
 @Module({
 	imports: [
 		ConfigModule.forRoot(),
 		GraphQLModule.forRoot({
-			driver: ApolloDriver, //Bu yerda GraphQL serverni NestJS ichida ishlashi uchun driver ko‘rsatilgan.
+			driver: ApolloDriver,
 			playground: true,
 			uploads: false,
 			autoSchemaFile: true,
 		}),
 	],
 	controllers: [AppController],
-	providers: [AppService],
+	providers: [AppService, AppResolver],
 })
 export class AppModule {}

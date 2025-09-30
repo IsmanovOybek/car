@@ -1,8 +1,32 @@
 {
   "$schema": "https://json.schemastore.org/nest-cli",
   "collection": "@nestjs/schematics",
-  "sourceRoot": "src",
+  "sourceRoot": "apps/car-api/src",
   "compilerOptions": {
-    "deleteOutDir": true
+    "deleteOutDir": true,
+    "webpack": true,
+    "tsConfigPath": "apps/car-api/tsconfig.app.json"
+  },
+  "monorepo": true,
+  "root": "apps/car-api",
+  "projects": {
+    "car-api": {
+      "type": "application",
+      "root": "apps/car-api",
+      "entryFile": "main",
+      "sourceRoot": "apps/car-api/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/car-api/tsconfig.app.json"
+      }
+    },
+    "car-batch": {
+      "type": "application",
+      "root": "apps/car-batch",
+      "entryFile": "main",
+      "sourceRoot": "apps/car-batch/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/car-batch/tsconfig.app.json"
+      }
+    }
   }
 }

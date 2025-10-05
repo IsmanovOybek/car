@@ -22,6 +22,25 @@ const MemberSchema = new Schema(
 			type: String,
 			index: { unique: true, sparse: true },
 			required: true,
+			match: [
+				/^(\+82|0?10)[0-9]{7,8}$|^(\+998)[0-9]{9}$|^(\+1)[0-9]{10}$/,
+				'Invalid phone format (only KR, UZ, US allowed)',
+			],
+		},
+		// ✅ yangi qo‘shilgan maydonlar (phone verification uchun)
+		verificationCode: {
+			type: String,
+			default: null, // SMS orqali yuborilgan kod
+		},
+
+		isVerified: {
+			type: Boolean,
+			default: false, // telefon tasdiqlanganmi
+		},
+
+		codeExpiresAt: {
+			type: Date,
+			default: null, // kodning amal muddati (3-5 daqiqa)
 		},
 		memberNick: {
 			type: String,

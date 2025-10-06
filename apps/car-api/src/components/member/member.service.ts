@@ -11,22 +11,41 @@ export class MemberService {
 	constructor(@InjectModel('Member') private readonly memberModel: Model<Member>) {}
 
 	// // 1️⃣ sendVerificationCode
-	// async sendVerificationCode(phone: string): Promise<boolean> {
-	// 	const code = Math.floor(100000 + Math.random() * 900000).toString();
+	async sendVerificationCode(phone: string): Promise<boolean> {
+		const code = Math.floor(100000 + Math.random() * 900000).toString();
 
-	// 	console.log(`📩 Verification code for ${phone}: ${code}`);
+		console.log(`📩 Verification code for ${phone}: ${code}`);
 
-	// 	await this.memberModel.updateOne(
-	// 		{ memberPhone: phone },
-	// 		{
-	// 			verificationCode: code,
-	// 			codeExpiresAt: new Date(Date.now() + 5 * 60 * 1000),
-	// 		},
-	// 		{ upsert: true },
-	// 	);
+		await this.memberModel.updateOne(
+			{ memberPhone: phone },
+			{
+				verificationCode: code,
+				codeExpiresAt: new Date(Date.now() + 5 * 60 * 1000),
+			},
+			{ upsert: true },
+		);
 
-	// 	return true;
-	// }
+		return true;
+	}
+
+	// 2️⃣ Kodni tekshirish
+    async verifyPhoneCode(phone: string, code: string): Promise<boolean> {
+        const member = await this.memberModel.findOne({ memberPhone: phone }).exec() as any;
+        if (!member) throw new BadRequestException('Invalid phone or code'); // generic xabar
+    
+        if (!member.verificationCode || member.verificationCode !== code)
+          throw new BadRequestException('Invalid phone or code');
+    
+        if (member.codeExpiresAt && member.codeExpiresAt < new Date())
+          throw new BadRequestException('Verification code expired');
+    
+        member.isVerified = true;
+        member.verificationCode = null;
+        member.codeExpiresAt = null;
+        await member.save();
+    
+        return true;
+      }
 
 	public async signup(input: MemberInput): Promise<Member> {
 		//TODO: hash password

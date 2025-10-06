@@ -8,10 +8,16 @@ import { Member } from '../../libs/dto/member/member';
 export class MemberResolver {
 	constructor(private readonly memberService: MemberService) {}
 
-	// @Mutation(() => Boolean)
-	// async sendVerificationCode(@Args('phone') phone: string): Promise<boolean> {
-	// 	return this.memberService.sendVerificationCode(phone);
-	// }
+	@Mutation(() => Boolean)
+	async sendVerificationCode(@Args('phone') phone: string): Promise<boolean> {
+		return this.memberService.sendVerificationCode(phone);
+	}
+
+	// 2. Kodni tekshirish (OTP verify)
+	@Mutation(() => Boolean)
+	async verifyPhoneCode(@Args('phone') phone: string, @Args('code') code: string): Promise<boolean> {
+		return this.memberService.verifyPhoneCode(phone, code);
+	}
 
 	@Mutation(() => Member)
 	@UsePipes(ValidationPipe)

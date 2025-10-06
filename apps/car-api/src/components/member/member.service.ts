@@ -5,10 +5,14 @@ import { LoginInput, MemberInput } from '../../libs/dto/member/member.input';
 import { Member } from '../../libs/dto/member/member';
 import { MemberStatus } from '../../libs/enums/member.enum';
 import { Message } from '../../libs/enums/common.enum';
+import { AuthService } from '../auth/auth.service';
 
 @Injectable()
 export class MemberService {
-	constructor(@InjectModel('Member') private readonly memberModel: Model<Member>) {}
+	constructor(
+		@InjectModel('Member') private readonly memberModel: Model<Member>,
+		private authService: AuthService,
+	) {}
 
 	// // 1️⃣ sendVerificationCode
 	async sendVerificationCode(phone: string): Promise<boolean> {
@@ -29,26 +33,26 @@ export class MemberService {
 	}
 
 	// 2️⃣ Kodni tekshirish
-    async verifyPhoneCode(phone: string, code: string): Promise<boolean> {
-        const member = await this.memberModel.findOne({ memberPhone: phone }).exec() as any;
-        if (!member) throw new BadRequestException('Invalid phone or code'); // generic xabar
-    
-        if (!member.verificationCode || member.verificationCode !== code)
-          throw new BadRequestException('Invalid phone or code');
-    
-        if (member.codeExpiresAt && member.codeExpiresAt < new Date())
-          throw new BadRequestException('Verification code expired');
-    
-        member.isVerified = true;
-        member.verificationCode = null;
-        member.codeExpiresAt = null;
-        await member.save();
-    
-        return true;
-      }
+	async verifyPhoneCode(phone: string, code: string): Promise<boolean> {
+		const member = (await this.memberModel.findOne({ memberPhone: phone }).exec()) as any;
+		if (!member) throw new BadRequestException('Invalid phone or code'); // generic xabar
+
+		if (!member.verificationCode || member.verificationCode !== code)
+			throw new BadRequestException('Invalid phone or code');
+
+		if (member.codeExpiresAt && member.codeExpiresAt < new Date())
+			throw new BadRequestException('Verification code expired');
+
+		member.isVerified = true;
+		member.verificationCode = null;
+		member.codeExpiresAt = null;
+		await member.save();
+
+		return true;
+	}
 
 	public async signup(input: MemberInput): Promise<Member> {
-		//TODO: hash password
+		input.memberPassword = await this.authService.hashPassWord(input.memberPassword);
 		try {
 			const result = await this.memberModel.create(input);
 			//TODO: authentication via token
@@ -71,8 +75,7 @@ export class MemberService {
 			throw new InternalServerErrorException(Message.BLOCKED_USER);
 		}
 
-		// TODO: Compare passwords
-		const isMatch = memberPassword === response.memberPassword;
+		const isMatch = await this.authService.comparePassWords(input.memberPassword, response.memberPassword);
 		if (!isMatch) throw new InternalServerErrorException(Message.WRONG_PASSWORD);
 
 		return response;

@@ -26,12 +26,11 @@ registerEnumType(CarType, {
 	name: 'CarType',
 });
 
-
 export enum CarStatus {
-	AVAILABLE = 'AVAILABLE',   // hozir bo‘sh, ijaraga olish mumkin
-	RENTED = 'RENTED',         // hozir band
-	MAINTENANCE = 'MAINTENANCE' // ta’mirda, vaqtincha ishlamaydi
-  }
+	ACTIVE = 'ACTIVE',
+	SOLD = 'SOLD',
+	DELETE = 'DELETE',
+}
 registerEnumType(CarStatus, {
 	name: 'CarStatus',
 });

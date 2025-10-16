@@ -1,4 +1,4 @@
-import { Args, Mutation, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { CarService } from './car.service';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { MemberType } from '../../libs/enums/member.enum';
@@ -8,6 +8,8 @@ import { AuthMember } from '../auth/decorators/authMember.decorator';
 import { ObjectId } from 'mongoose';
 import { Car } from '../../libs/dto/car/car';
 import { CarInput } from '../../libs/dto/car/car.input';
+import { WithoutGuard } from '../auth/guards/without.guard';
+import { shapeIntoMongoObjectId } from '../../libs/types/config';
 
 @Resolver()
 export class CarResolver {
@@ -20,5 +22,14 @@ export class CarResolver {
 		console.log('Mutation: createdCar');
 		input.memberId = memberId;
 		return await this.carService.createCar(input);
+	}
+
+	@UseGuards(WithoutGuard)
+	@Query((returns) => Car)
+	public async getCar(@Args('carId') input: string, @AuthMember('_id') memberId: ObjectId): Promise<Car> {
+		console.log('Query: carId');
+		console.log('Query: =>', input);
+		const carId = shapeIntoMongoObjectId(input);
+		return await this.carService.getCar(memberId, carId);
 	}
 }

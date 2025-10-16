@@ -18,7 +18,7 @@ const CarSchema = new Schema(
 		carStatus: {
 			type: String,
 			enum: CarStatus,
-			default: CarStatus.AVAILABLE,
+			default: CarStatus.ACTIVE,
 		},
 
 		carLocation: {

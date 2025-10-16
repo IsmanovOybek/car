@@ -1,16 +1,21 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, ObjectId } from 'mongoose';
 import { CarInput } from '../../libs/dto/car/car.input';
 import { Car } from '../../libs/dto/car/car';
 import { MemberService } from '../member/member.service';
 import { Message } from '../../libs/enums/common.enum';
+import { StatisticModifier, T } from '../../libs/types/common';
+import { CarStatus } from '../../libs/enums/car.enum';
+import { ViewGroup } from '../../libs/enums/view.enum';
+import { ViewService } from '../view/view.service';
 
 @Injectable()
 export class CarService {
 	constructor(
 		@InjectModel('Car') private readonly carModel: Model<Car>,
 		private memberService: MemberService,
+		private viewService: ViewService,
 	) {}
 
 	public async createCar(input: CarInput): Promise<Car> {
@@ -28,5 +33,34 @@ export class CarService {
 			console.log('Error, Service.model:', err.message);
 			throw new BadRequestException(Message.CREATE_FAILED);
 		}
+	}
+
+	public async getCar(memberId: ObjectId, carId: ObjectId): Promise<Car> {
+		const search: T = {
+			_id: carId,
+			carStatus: CarStatus.ACTIVE,
+		};
+
+		const targetProperty: Car = await this.carModel.findOne(search).lean().exec();
+		if (!targetProperty) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+
+		if (memberId) {
+			const viewInput = { memberId: memberId, viewRefId: carId, viewGroup: ViewGroup.CAR };
+			const newView = await this.viewService.recordView(viewInput);
+			if (newView) {
+				await this.propertyStatsEditor({ _id: carId, targetKey: 'carViews', modifier: 1 });
+				targetProperty.carViews++;
+			}
+		}
+
+		// meLiked
+
+		targetProperty.memberData = await this.memberService.getMember(null, targetProperty.memberId);
+		return targetProperty;
+	}
+
+	public async propertyStatsEditor(input: StatisticModifier): Promise<Car> {
+		const { _id, targetKey, modifier } = input;
+		return await this.carModel.findByIdAndUpdate(_id, { $inc: { [targetKey]: modifier } }, { new: true }).exec();
 	}
 }

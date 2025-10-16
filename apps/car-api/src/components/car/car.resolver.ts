@@ -10,6 +10,7 @@ import { Car } from '../../libs/dto/car/car';
 import { CarInput } from '../../libs/dto/car/car.input';
 import { WithoutGuard } from '../auth/guards/without.guard';
 import { shapeIntoMongoObjectId } from '../../libs/types/config';
+import { CarUpdate } from '../../libs/dto/car/car.update';
 
 @Resolver()
 export class CarResolver {
@@ -31,5 +32,17 @@ export class CarResolver {
 		console.log('Query: =>', input);
 		const carId = shapeIntoMongoObjectId(input);
 		return await this.carService.getCar(memberId, carId);
+	}
+
+    @Roles(MemberType.AGENT)
+	@UseGuards(RolesGuard)
+	@Mutation((returns) => Car)
+	public async updateCar(
+		@Args('input') input: CarUpdate,
+		@AuthMember('_id') memberId: ObjectId,
+	): Promise<Car> {
+		console.log('Mutation: updateCar');
+		input._id = shapeIntoMongoObjectId(input._id);
+		return await this.carService.updateCar(memberId, input);
 	}
 }

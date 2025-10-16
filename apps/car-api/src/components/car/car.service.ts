@@ -9,6 +9,8 @@ import { StatisticModifier, T } from '../../libs/types/common';
 import { CarStatus } from '../../libs/enums/car.enum';
 import { ViewGroup } from '../../libs/enums/view.enum';
 import { ViewService } from '../view/view.service';
+import * as moment from 'moment';
+import { CarUpdate } from '../../libs/dto/car/car.update';
 
 @Injectable()
 export class CarService {
@@ -62,5 +64,34 @@ export class CarService {
 	public async propertyStatsEditor(input: StatisticModifier): Promise<Car> {
 		const { _id, targetKey, modifier } = input;
 		return await this.carModel.findByIdAndUpdate(_id, { $inc: { [targetKey]: modifier } }, { new: true }).exec();
+	}
+
+	public async updateCar(memberId: ObjectId, input: CarUpdate): Promise<Car> {
+		let { carStatus, soldAt, deletedAt } = input;
+		const search: T = {
+			_id: input._id,
+			memberId: memberId,
+			carStatus: CarStatus.ACTIVE,
+		};
+
+		if (carStatus === CarStatus.SOLD) soldAt = moment().toDate();
+		else if (carStatus === CarStatus.DELETE) deletedAt = moment().toDate();
+
+		const result = await this.carModel
+			.findOneAndUpdate(search, input, {
+				new: true,
+			})
+			.exec();
+		if (!result) throw new InternalServerErrorException(Message.UPDATE_FAILED);
+
+		if (soldAt || deletedAt) {
+			await this.memberService.memberStatsEditor({
+				_id: memberId,
+				targetKey: 'memberCars',
+				modifier: -1,
+			});
+		}
+
+		return result;
 	}
 }

@@ -92,7 +92,7 @@ const CarSchema = new Schema(
 			ref: 'Member',
 		},
 
-		rentedAt: {
+		soldAt: {
 			type: Date,
 		},
 

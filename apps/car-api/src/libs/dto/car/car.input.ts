@@ -189,3 +189,40 @@ export class AgentCarInquiry {
 	@Field(() => APISearch)
 	search: APISearch;
 }
+
+@InputType()
+class ALPISearch {
+	@IsOptional()
+	@Field(() => CarStatus, { nullable: true })
+	carStatus?: CarStatus;
+
+	@IsOptional()
+	@Field(() => [CarLocation], { nullable: true })
+	carLocationList?: CarLocation[];
+}
+
+@InputType()
+export class AllCarsInquiry {
+	@IsNotEmpty()
+	@Min(1)
+	@Field(() => Int)
+	page: number;
+
+	@IsNotEmpty()
+	@Min(1)
+	@Field(() => Int)
+	limit: number;
+
+	@IsOptional()
+	@IsIn(availablePropertySorts)
+	@Field(() => String, { nullable: true })
+	sort?: string;
+
+	@IsOptional()
+	@Field(() => Direction, { nullable: true })
+	direction?: Direction;
+
+	@IsNotEmpty()
+	@Field(() => ALPISearch)
+	search: ALPISearch;
+}

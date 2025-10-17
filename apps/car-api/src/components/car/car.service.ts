@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId } from 'mongoose';
-import { AgentCarInquiry, CarInput, CarsInquiry } from '../../libs/dto/car/car.input';
+import { AgentCarInquiry, AllCarsInquiry, CarInput, CarsInquiry } from '../../libs/dto/car/car.input';
 import { Car, Cars } from '../../libs/dto/car/car';
 import { MemberService } from '../member/member.service';
 import { Direction, Message } from '../../libs/enums/common.enum';
@@ -156,6 +156,37 @@ export class CarService {
 			carStatus: carStatus ?? { $ne: CarStatus.DELETE },
 		};
 		const sort: T = { [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC };
+
+		const result = await this.carModel
+			.aggregate([
+				{ $match: match },
+				{ $sort: sort },
+				{
+					$facet: {
+						list: [
+							{ $skip: (input.page - 1) * input.limit },
+							{ $limit: input.limit },
+							lookupMember,
+							{ $unwind: '$memberData' },
+						],
+						metaCounter: [{ $count: 'total' }],
+					},
+				},
+			])
+			.exec();
+
+		if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+
+		return result[0];
+	}
+
+	public async getAllCarsByAdmin(input: AllCarsInquiry): Promise<Cars> {
+		const { carStatus, carLocationList } = input.search;
+		const match: T = {};
+		const sort: T = { [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC };
+
+		if (carStatus) match.carStatus = carStatus;
+		if (carLocationList) match.carLocationList = { $in: carLocationList };
 
 		const result = await this.carModel
 			.aggregate([

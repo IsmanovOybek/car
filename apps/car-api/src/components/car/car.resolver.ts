@@ -7,7 +7,7 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { AuthMember } from '../auth/decorators/authMember.decorator';
 import { ObjectId } from 'mongoose';
 import { Car, Cars } from '../../libs/dto/car/car';
-import { CarInput, CarsInquiry } from '../../libs/dto/car/car.input';
+import { AgentCarInquiry, CarInput, CarsInquiry } from '../../libs/dto/car/car.input';
 import { WithoutGuard } from '../auth/guards/without.guard';
 import { shapeIntoMongoObjectId } from '../../libs/types/config';
 import { CarUpdate } from '../../libs/dto/car/car.update';
@@ -49,5 +49,16 @@ export class CarResolver {
 		console.log('Query: getCars');
 		console.log('Query: => ', input);
 		return await this.carService.getCars(memberId, input);
+	}
+
+	@Roles(MemberType.AGENT)
+	@UseGuards(RolesGuard)
+	@Query((returns) => Cars)
+	public async getAgentCars(
+		@Args('input') input: AgentCarInquiry,
+		@AuthMember('_id') memberId: ObjectId,
+	): Promise<Cars> {
+		console.log('Query: getAgentCars');
+		return await this.carService.getAgentCars(memberId, input);
 	}
 }

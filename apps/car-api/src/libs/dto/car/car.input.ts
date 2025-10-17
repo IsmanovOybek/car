@@ -1,7 +1,7 @@
 import { Field, InputType, Int } from '@nestjs/graphql';
 import { IsIn, IsInt, IsNotEmpty, IsOptional, Length, Min } from 'class-validator';
 import { ObjectId } from 'mongoose';
-import { CarBrand, CarLocation, CarType } from '../../enums/car.enum';
+import { CarBrand, CarLocation, CarStatus, CarType } from '../../enums/car.enum';
 import { availableOptions, availablePropertySorts } from '../../types/config';
 import { Direction } from '../../enums/common.enum';
 
@@ -155,4 +155,37 @@ export class CarsInquiry {
 	@IsNotEmpty()
 	@Field(() => PISearch, { nullable: true })
 	search: PISearch;
+}
+
+@InputType()
+class APISearch {
+	@IsOptional()
+	@Field(() => CarStatus, { nullable: true })
+	carStatus?: CarStatus;
+}
+
+@InputType()
+export class AgentCarInquiry {
+	@IsNotEmpty()
+	@Min(1)
+	@Field(() => Int)
+	page: number;
+
+	@IsNotEmpty()
+	@Min(1)
+	@Field(() => Int)
+	limit: number;
+
+	@IsOptional()
+	@IsIn(availablePropertySorts)
+	@Field(() => String, { nullable: true })
+	sort?: string;
+
+	@IsOptional()
+	@Field(() => Direction, { nullable: true })
+	direction?: Direction;
+
+	@IsNotEmpty()
+	@Field(() => APISearch)
+	search: APISearch;
 }

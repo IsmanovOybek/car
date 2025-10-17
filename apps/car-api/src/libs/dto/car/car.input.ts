@@ -2,6 +2,8 @@ import { Field, InputType, Int } from '@nestjs/graphql';
 import { IsIn, IsInt, IsNotEmpty, IsOptional, Length, Min } from 'class-validator';
 import { ObjectId } from 'mongoose';
 import { CarBrand, CarLocation, CarType } from '../../enums/car.enum';
+import { availableOptions, availablePropertySorts } from '../../types/config';
+import { Direction } from '../../enums/common.enum';
 
 @InputType()
 export class CarInput {
@@ -61,4 +63,96 @@ export class CarInput {
 	@IsOptional()
 	@Field(() => Date, { nullable: true })
 	constructedAt?: Date;
+}
+
+@InputType()
+export class PricesRange {
+	@Field(() => Int)
+	start: number;
+
+	@Field(() => Int)
+	end: number;
+}
+
+@InputType()
+export class MileageRange {
+	@Field(() => Int)
+	start: number;
+
+	@Field(() => Int)
+	end: number;
+}
+
+@InputType()
+export class PeriodsRange {
+	@Field(() => Date)
+	start: Date;
+
+	@Field(() => Date)
+	end: Date;
+}
+
+@InputType()
+class PISearch {
+	@IsOptional()
+	@Field(() => String, { nullable: true })
+	memberId?: ObjectId;
+
+	@IsOptional()
+	@Field(() => [CarLocation], { nullable: true })
+	locationList?: CarLocation[];
+
+	@IsOptional()
+	@Field(() => [CarType], { nullable: true })
+	typeList?: CarType[];
+
+	@IsOptional()
+	@Field(() => [Int], { nullable: true })
+	yearList?: number[]; // ishlab chiqarilgan yillar (masalan [2019, 2020, 2021])
+
+	@IsOptional()
+	@Field(() => [String], { nullable: true })
+	brandList?: string[]; // “Hyundai”, “Kia”, “BMW” va h.k.
+
+	@IsOptional()
+	@IsIn(availableOptions, { each: true })
+	@Field(() => [String], { nullable: true })
+	options?: string[];
+
+	@IsOptional()
+	@Field(() => PricesRange, { nullable: true })
+	pricesRange?: PricesRange;
+
+	@IsOptional()
+	@Field(() => MileageRange, { nullable: true })
+	mileageRange?: MileageRange;
+
+	@IsOptional()
+	@Field(() => String, { nullable: true })
+	text?: string;
+}
+@InputType()
+export class CarsInquiry {
+	@IsNotEmpty()
+	@Min(1)
+	@Field(() => Int)
+	page: number;
+
+	@IsNotEmpty()
+	@Min(1)
+	@Field(() => Int)
+	limit: number;
+
+	@IsOptional()
+	@IsIn(availablePropertySorts)
+	@Field(() => String, { nullable: true })
+	sort?: string;
+
+	@IsOptional()
+	@Field(() => Direction, { nullable: true })
+	direction?: Direction;
+
+	@IsNotEmpty()
+	@Field(() => PISearch, { nullable: true })
+	search: PISearch;
 }

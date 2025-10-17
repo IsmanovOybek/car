@@ -6,8 +6,8 @@ import { UseGuards } from '@nestjs/common';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { AuthMember } from '../auth/decorators/authMember.decorator';
 import { ObjectId } from 'mongoose';
-import { Car } from '../../libs/dto/car/car';
-import { CarInput } from '../../libs/dto/car/car.input';
+import { Car, Cars } from '../../libs/dto/car/car';
+import { CarInput, CarsInquiry } from '../../libs/dto/car/car.input';
 import { WithoutGuard } from '../auth/guards/without.guard';
 import { shapeIntoMongoObjectId } from '../../libs/types/config';
 import { CarUpdate } from '../../libs/dto/car/car.update';
@@ -34,15 +34,20 @@ export class CarResolver {
 		return await this.carService.getCar(memberId, carId);
 	}
 
-    @Roles(MemberType.AGENT)
+	@Roles(MemberType.AGENT)
 	@UseGuards(RolesGuard)
 	@Mutation((returns) => Car)
-	public async updateCar(
-		@Args('input') input: CarUpdate,
-		@AuthMember('_id') memberId: ObjectId,
-	): Promise<Car> {
+	public async updateCar(@Args('input') input: CarUpdate, @AuthMember('_id') memberId: ObjectId): Promise<Car> {
 		console.log('Mutation: updateCar');
 		input._id = shapeIntoMongoObjectId(input._id);
 		return await this.carService.updateCar(memberId, input);
+	}
+
+	@UseGuards(WithoutGuard)
+	@Query((returns) => Cars)
+	public async getCars(@Args('input') input: CarsInquiry, @AuthMember('_id') memberId: ObjectId): Promise<Cars> {
+		console.log('Query: getCars');
+		console.log('Query: => ', input);
+		return await this.carService.getCars(memberId, input);
 	}
 }

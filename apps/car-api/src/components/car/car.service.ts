@@ -1,16 +1,17 @@
 import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId } from 'mongoose';
-import { CarInput } from '../../libs/dto/car/car.input';
-import { Car } from '../../libs/dto/car/car';
+import { CarInput, CarsInquiry } from '../../libs/dto/car/car.input';
+import { Car, Cars } from '../../libs/dto/car/car';
 import { MemberService } from '../member/member.service';
-import { Message } from '../../libs/enums/common.enum';
+import { Direction, Message } from '../../libs/enums/common.enum';
 import { StatisticModifier, T } from '../../libs/types/common';
 import { CarStatus } from '../../libs/enums/car.enum';
 import { ViewGroup } from '../../libs/enums/view.enum';
 import { ViewService } from '../view/view.service';
 import * as moment from 'moment';
 import { CarUpdate } from '../../libs/dto/car/car.update';
+import { lookupMember, shapeIntoMongoObjectId } from '../../libs/types/config';
 
 @Injectable()
 export class CarService {
@@ -93,5 +94,56 @@ export class CarService {
 		}
 
 		return result;
+	}
+
+	public async getCars(memberId: ObjectId, input: CarsInquiry): Promise<Cars> {
+		const match: T = { carStatus: CarStatus.ACTIVE };
+		const sort: T = { [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC };
+
+		this.shapeMatchQuery(match, input);
+		console.log('match:', match);
+
+		const result = await this.carModel
+			.aggregate([
+				{ $match: match },
+				{ $sort: sort },
+				{
+					$facet: {
+						list: [
+							{ $skip: (input.page - 1) * input.limit },
+							{ $limit: input.limit },
+							// meLiked
+							lookupMember,
+							{ $unwind: '$memberData' },
+						],
+						metaCounter: [{ $count: 'total' }],
+					},
+				},
+			])
+			.exec();
+		if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+
+		return result[0];
+	}
+
+	private shapeMatchQuery(match: T, input: CarsInquiry): void {
+		const { memberId, locationList, typeList, yearList, brandList, pricesRange, mileageRange, options, text } =
+			input.search ?? {};
+
+		if (memberId) match.memberId = shapeIntoMongoObjectId(memberId);
+		if (locationList) match.carLocation = { $in: locationList };
+		if (yearList) match.carYears = { $in: yearList };
+		if (brandList) match.carBrand = { $in: brandList };
+		if (typeList) match.carType = { $in: typeList };
+
+		if (pricesRange) match.carPrice = { $gte: pricesRange.start, $lte: pricesRange.end };
+		if (mileageRange) match.carMileage = { $gte: mileageRange.start, $lte: mileageRange.end };
+
+		if (text) match.carTitle = { $regex: new RegExp(text, 'i') };
+		if (options) {
+			match['$or'] = options.map((ele) => {
+				return { [ele]: true };
+			});
+		}
 	}
 }

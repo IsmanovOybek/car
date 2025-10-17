@@ -210,4 +210,32 @@ export class CarService {
 
 		return result[0];
 	}
+
+	public async updateCarByAdmin(input: CarUpdate): Promise<Car> {
+		let { carStatus, soldAt, deletedAt } = input;
+		const search: T = {
+			_id: input._id,
+			carStatus: CarStatus.ACTIVE,
+		};
+
+		if (carStatus === CarStatus.SOLD) soldAt = moment().toDate();
+		else if (carStatus === CarStatus.DELETE) deletedAt = moment().toDate();
+
+		const result = await this.carModel
+			.findOneAndUpdate(search, input, {
+				new: true,
+			})
+			.exec();
+		if (!result) throw new InternalServerErrorException(Message.UPDATE_FAILED);
+
+		if (soldAt || deletedAt) {
+			await this.memberService.memberStatsEditor({
+				_id: result.memberId,
+				targetKey: 'memberCars',
+				modifier: -1,
+			});
+		}
+
+		return result;
+	}
 }

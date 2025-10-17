@@ -81,4 +81,13 @@ export class CarResolver {
 		input._id = shapeIntoMongoObjectId(input._id);
 		return await this.carService.updateCarByAdmin(input);
 	}
+
+	@Roles(MemberType.ADMIN)
+	@UseGuards(RolesGuard)
+	@Mutation((returns) => Car)
+	public async removeCarByAdmin(@Args('carId') input: string): Promise<Car> {
+		console.log('Mutation: removeCarByAdmin');
+		const carId = shapeIntoMongoObjectId(input);
+		return await this.carService.removeCarByAdmin(carId);
+	}
 }

@@ -238,4 +238,12 @@ export class CarService {
 
 		return result;
 	}
+
+	public async removeCarByAdmin(carId: ObjectId): Promise<Car> {
+		const search: T = { _id: carId, carStatus: CarStatus.DELETE };
+		const result = await this.carModel.findOneAndDelete(search).exec();
+		if (!result) throw new InternalServerErrorException(Message.REMOVE_FAILED);
+
+		return result;
+	}
 }

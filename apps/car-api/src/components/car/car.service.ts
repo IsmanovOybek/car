@@ -68,15 +68,15 @@ export class CarService {
 	}
 
 	public async updateCar(memberId: ObjectId, input: CarUpdate): Promise<Car> {
-		let { carStatus, soldAt, deletedAt } = input;
+		let { carStatus } = input;
 		const search: T = {
 			_id: input._id,
 			memberId: memberId,
 			carStatus: CarStatus.ACTIVE,
 		};
 
-		if (carStatus === CarStatus.SOLD) soldAt = moment().toDate();
-		else if (carStatus === CarStatus.DELETE) deletedAt = moment().toDate();
+		if (carStatus === CarStatus.SOLD) input.soldAt = moment().toDate();
+		else if (carStatus === CarStatus.DELETE) input.deletedAt = moment().toDate();
 
 		const result = await this.carModel
 			.findOneAndUpdate(search, input, {
@@ -85,7 +85,7 @@ export class CarService {
 			.exec();
 		if (!result) throw new InternalServerErrorException(Message.UPDATE_FAILED);
 
-		if (soldAt || deletedAt) {
+		if (input.soldAt || input.deletedAt) {
 			await this.memberService.memberStatsEditor({
 				_id: memberId,
 				targetKey: 'memberCars',

@@ -86,4 +86,16 @@ export class BoardArticleResolver {
 		input._id = shapeIntoMongoObjectId(input._id);
 		return await this.boardArticleService.updateBoardArticleByAdmin(input);
 	}
+
+	@Roles(MemberType.ADMIN)
+	@UseGuards(RolesGuard)
+	@Mutation((returns) => BoardArticle)
+	public async removeBoardArticleByAdmin(
+		@Args('articleId') input: string,
+		@AuthMember('_id') memberId: ObjectId,
+	): Promise<BoardArticle> {
+		console.log('Mutation: removeBoardArticleByAdmin');
+		const articleId = shapeIntoMongoObjectId(input);
+		return await this.boardArticleService.removeBoardArticleByAdmin(articleId);
+	}
 }

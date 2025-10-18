@@ -190,6 +190,16 @@ export class BoardArticleService {
 		return result;
 	}
 
+	public async removeBoardArticleByAdmin(articleId: ObjectId): Promise<BoardArticle> {
+		const search = { _id: articleId, articleStatus: BoardArticleStatus.DELETE };
+
+		const result = await this.boardArticleModel.findOneAndDelete(search).exec();
+
+		if (!result) throw new InternalServerErrorException(Message.REMOVE_FAILED);
+
+		return result;
+	}
+
 	public async boardArticleStatsEditor(input: StatisticModifier): Promise<BoardArticle> {
 		const { _id, targetKey, modifier } = input;
 

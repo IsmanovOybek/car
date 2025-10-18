@@ -4,7 +4,11 @@ import { Model, ObjectId } from 'mongoose';
 import { BoardArticle, BoardArticles } from '../../libs/dto/board-article/board-article';
 import { MemberService } from '../member/member.service';
 import { ViewService } from '../view/view.service';
-import { BoardArticleInput, BoardArticlesInquiry } from '../../libs/dto/board-article/board-article.input';
+import {
+	AllBoardArticlesInquiry,
+	BoardArticleInput,
+	BoardArticlesInquiry,
+} from '../../libs/dto/board-article/board-article.input';
 import { Direction, Message } from '../../libs/enums/common.enum';
 import { StatisticModifier, T } from '../../libs/types/common';
 import { BoardArticleStatus } from '../../libs/enums/board-article.enum';
@@ -75,14 +79,6 @@ export class BoardArticleService {
 		return targetBoardArticle;
 	}
 
-	public async boardArticleStatsEditor(input: StatisticModifier): Promise<BoardArticle> {
-		const { _id, targetKey, modifier } = input;
-
-		return await this.boardArticleModel
-			.findByIdAndUpdate(_id, { $inc: { [targetKey]: modifier } }, { new: true })
-			.exec();
-	}
-
 	public async updateBoardArticle(memberId: ObjectId, input: BoardArticleUpdate): Promise<BoardArticle> {
 		const { _id, articleStatus } = input;
 
@@ -141,5 +137,46 @@ export class BoardArticleService {
 		if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
 
 		return result[0];
+	}
+
+	public async getAllBoardArticlesByAdmin(input: AllBoardArticlesInquiry): Promise<BoardArticles> {
+		const { articleStatus, articleCategory } = input.search;
+
+		const match: T = {};
+		const sort: T = { [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC };
+
+		if (articleStatus) match.articleStatus = articleStatus;
+		if (articleCategory) match.articleCategory = articleCategory;
+
+		const result = await this.boardArticleModel
+			.aggregate([
+				{ $match: match },
+				{ $sort: sort },
+				{
+					$facet: {
+						list: [
+							{ $skip: (input.page - 1) * input.limit },
+							{ $limit: input.limit },
+							lookupMember,
+							{ $unwind: '$memberData' },
+						],
+						metaCounter: [{ $count: 'total' }],
+					},
+				},
+			])
+			.exec();
+
+		if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+
+		return result[0];
+	}
+    
+
+	public async boardArticleStatsEditor(input: StatisticModifier): Promise<BoardArticle> {
+		const { _id, targetKey, modifier } = input;
+
+		return await this.boardArticleModel
+			.findByIdAndUpdate(_id, { $inc: { [targetKey]: modifier } }, { new: true })
+			.exec();
 	}
 }

@@ -9,10 +9,11 @@ import { Message } from '../../libs/enums/common.enum';
 import { StatisticModifier } from '../../libs/types/common';
 import { BoardArticleStatus } from '../../libs/enums/board-article.enum';
 import { ViewGroup } from '../../libs/enums/view.enum';
+import { BoardArticleUpdate } from '../../libs/dto/board-article/board-article.update';
 
 @Injectable()
 export class BoardArticleService {
-    constructor(
+	constructor(
 		@InjectModel('BoardArticle') private readonly boardArticleModel: Model<BoardArticle>,
 		private readonly memberService: MemberService,
 		private readonly viewService: ViewService,
@@ -38,7 +39,7 @@ export class BoardArticleService {
 		}
 	}
 
-    public async getBoardArticle(memberId: ObjectId, articleId: ObjectId): Promise<BoardArticle> {
+	public async getBoardArticle(memberId: ObjectId, articleId: ObjectId): Promise<BoardArticle> {
 		const search = {
 			_id: articleId,
 			articleStatus: BoardArticleStatus.ACTIVE,
@@ -79,5 +80,27 @@ export class BoardArticleService {
 		return await this.boardArticleModel
 			.findByIdAndUpdate(_id, { $inc: { [targetKey]: modifier } }, { new: true })
 			.exec();
+	}
+
+	public async updateBoardArticle(memberId: ObjectId, input: BoardArticleUpdate): Promise<BoardArticle> {
+		const { _id, articleStatus } = input;
+
+		const result = await this.boardArticleModel
+			.findOneAndUpdate({ _id: _id, memberId: memberId, articleStatus: BoardArticleStatus.ACTIVE }, input, {
+				new: true,
+			})
+			.exec();
+
+		if (!result) throw new InternalServerErrorException(Message.UPDATE_FAILED);
+
+		if (articleStatus === BoardArticleStatus.DELETE) {
+			await this.memberService.memberStatsEditor({
+				_id: memberId,
+				targetKey: 'memberArticles',
+				modifier: -1,
+			});
+		}
+
+		return result;
 	}
 }

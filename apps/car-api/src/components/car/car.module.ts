@@ -11,5 +11,6 @@ import { MemberModule } from '../member/member.module';
 	imports: [MongooseModule.forFeature([{ name: 'Car', schema: CarSchema }]), AuthModule, ViewModule, MemberModule],
 
 	providers: [CarResolver, CarService],
+	exports: [CarService],
 })
 export class CarModule {}

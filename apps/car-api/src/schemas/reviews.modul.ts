@@ -11,7 +11,7 @@ const ReviewsSchema = new Schema(
 		refId: {
 			type: Schema.Types.ObjectId,
 			required: true,
-			ref: 'Car',
+			refPath: 'reviewGroupRef',
 		},
 		memberId: {
 			type: Schema.Types.ObjectId,
@@ -20,16 +20,8 @@ const ReviewsSchema = new Schema(
 		},
 		rating: {
 			type: Number,
-			default: 0,
-		},
-
-		likes: {
-			type: Number,
-			default: 0,
-		},
-
-		reviewText: {
-			type: String,
+			min: 1,
+			max: 5,
 			required: true,
 		},
 	},

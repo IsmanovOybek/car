@@ -11,6 +11,7 @@ import { AgentCarInquiry, AllCarsInquiry, CarInput, CarsInquiry } from '../../li
 import { WithoutGuard } from '../auth/guards/without.guard';
 import { shapeIntoMongoObjectId } from '../../libs/types/config';
 import { CarUpdate } from '../../libs/dto/car/car.update';
+import { AuthGuard } from '../auth/guards/auth.guard';
 
 @Resolver()
 export class CarResolver {
@@ -60,6 +61,17 @@ export class CarResolver {
 	): Promise<Cars> {
 		console.log('Query: getAgentCars');
 		return await this.carService.getAgentCars(memberId, input);
+	}
+
+	@UseGuards(AuthGuard)
+	@Mutation(() => Car)
+	public async likeTargetProperty(
+		@Args('carId') input: string,
+		@AuthMember('_id') memberId: ObjectId,
+	): Promise<Car> {
+		console.log('Mutation: LikeTargetProperty');
+		const likeRefId = shapeIntoMongoObjectId(input);
+		return await this.carService.likeTargetProperty(memberId, likeRefId);
 	}
 
 	/*** ADMIN ***/

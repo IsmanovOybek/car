@@ -77,6 +77,15 @@ const CarSchema = new Schema(
 			default: 0,
 		},
 
+		carRating: {
+			type: Number,
+			default: 0,
+		},
+		carRatingCount: {
+			type: Number,
+			default: 0,
+		},
+
 		carImages: {
 			type: [String],
 			required: true,

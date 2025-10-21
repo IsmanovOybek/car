@@ -27,21 +27,21 @@ const MemberSchema = new Schema(
 				'Invalid phone format (only KR, UZ, US allowed)',
 			],
 		},
-		 // ✅ yangi qo‘shilgan maydonlar (phone verification uchun)
-		 verificationCode: {
+		// ✅ yangi qo‘shilgan maydonlar (phone verification uchun)
+		verificationCode: {
 			type: String,
 			default: null, // SMS orqali yuborilgan kod
-		  },
-	  
-		  isVerified: {
+		},
+
+		isVerified: {
 			type: Boolean,
 			default: false, // telefon tasdiqlanganmi
-		  },
-	  
-		  codeExpiresAt: {
+		},
+
+		codeExpiresAt: {
 			type: Date,
 			default: null, // kodning amal muddati (3-5 daqiqa)
-		  },
+		},
 		memberNick: {
 			type: String,
 			index: { unique: true, sparse: true },
@@ -94,6 +94,15 @@ const MemberSchema = new Schema(
 			type: Number,
 			default: 0,
 		},
+		memberRating: {
+			type: Number,
+			default: 0,
+		},
+		memberRatingCount: {
+			type: Number,
+			default: 0,
+		},
+
 		memberComments: {
 			type: Number,
 			default: 0,

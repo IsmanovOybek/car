@@ -12,6 +12,9 @@ import { ViewService } from '../view/view.service';
 import * as moment from 'moment';
 import { CarUpdate } from '../../libs/dto/car/car.update';
 import { lookupMember, shapeIntoMongoObjectId } from '../../libs/types/config';
+import { LikeService } from '../like/like.service';
+import { LikeInput } from '../../libs/dto/like/like.input';
+import { LikeGroup } from '../../libs/enums/like.enum';
 
 @Injectable()
 export class CarService {
@@ -19,6 +22,7 @@ export class CarService {
 		@InjectModel('Car') private readonly carModel: Model<Car>,
 		private memberService: MemberService,
 		private viewService: ViewService,
+		private likeService: LikeService,
 	) {}
 
 	public async createCar(input: CarInput): Promise<Car> {
@@ -60,11 +64,6 @@ export class CarService {
 
 		targetProperty.memberData = await this.memberService.getMember(null, targetProperty.memberId);
 		return targetProperty;
-	}
-
-	public async propertyStatsEditor(input: StatisticModifier): Promise<Car> {
-		const { _id, targetKey, modifier } = input;
-		return await this.carModel.findByIdAndUpdate(_id, { $inc: { [targetKey]: modifier } }, { new: true }).exec();
 	}
 
 	public async updateCar(memberId: ObjectId, input: CarUpdate): Promise<Car> {
@@ -180,6 +179,27 @@ export class CarService {
 		return result[0];
 	}
 
+	public async likeTargetProperty(memberId: ObjectId, likeRefId: ObjectId): Promise<Car> {
+		const target: Car = await this.carModel.findOne({ _id: likeRefId, carStatus: CarStatus.ACTIVE }).exec();
+		if (!target) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+
+		const input: LikeInput = {
+			memberId: memberId,
+			likeRefId: likeRefId,
+			likeGroup: LikeGroup.CAR,
+		};
+
+		const modifier: number = await this.likeService.toggeLike(input);
+		const result = await this.propertyStatsEditor({
+			_id: likeRefId,
+			targetKey: 'carLikes',
+			modifier: modifier,
+		});
+
+		if (!result) throw new InternalServerErrorException(Message.SOMETHING_WENT_WRONG);
+		return result;
+	}
+
 	public async getAllCarsByAdmin(input: AllCarsInquiry): Promise<Cars> {
 		const { carStatus, carLocationList } = input.search;
 		const match: T = {};
@@ -245,5 +265,10 @@ export class CarService {
 		if (!result) throw new InternalServerErrorException(Message.REMOVE_FAILED);
 
 		return result;
+	}
+
+	public async propertyStatsEditor(input: StatisticModifier): Promise<Car> {
+		const { _id, targetKey, modifier } = input;
+		return await this.carModel.findByIdAndUpdate(_id, { $inc: { [targetKey]: modifier } }, { new: true }).exec();
 	}
 }

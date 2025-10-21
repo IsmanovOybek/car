@@ -9,9 +9,15 @@ import { MemberModule } from '../member/member.module';
 import { LikeModule } from '../like/like.module';
 
 @Module({
-	imports: [MongooseModule.forFeature([{ name: 'Car', schema: CarSchema }]), AuthModule, ViewModule, MemberModule,LikeModule],
+	imports: [
+		MongooseModule.forFeature([{ name: 'Car', schema: CarSchema }]),
+		AuthModule,
+		ViewModule,
+		MemberModule,
+		LikeModule,
+	],
 
 	providers: [CarResolver, CarService],
-	exports: [CarService],
+	exports: [CarService,],
 })
 export class CarModule {}

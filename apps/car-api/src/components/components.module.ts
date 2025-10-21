@@ -7,8 +7,9 @@ import { BoardArticleModule } from './board-article/board-article.module';
 import { CommentModule } from './comment/comment.module';
 import { LikeModule } from './like/like.module';
 import { ReviewModule } from './review/review.module';
+import { FollowModule } from './follow/follow.module';
 
 @Module({
-	imports: [MemberModule, CarModule, AuthModule, ViewModule, BoardArticleModule, CommentModule, LikeModule, ReviewModule],
+	imports: [MemberModule, CarModule, AuthModule, ViewModule, BoardArticleModule, CommentModule, LikeModule, ReviewModule, FollowModule],
 })
 export class ComponentsModule {}

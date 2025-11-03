@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId } from 'mongoose';
-import { AgentCarInquiry, AllCarsInquiry, CarInput, CarsInquiry } from '../../libs/dto/car/car.input';
+import { AgentCarInquiry, AllCarsInquiry, CarInput, CarsInquiry, OrdinaryInquiry } from '../../libs/dto/car/car.input';
 import { Car, Cars } from '../../libs/dto/car/car';
 import { MemberService } from '../member/member.service';
 import { Direction, Message } from '../../libs/enums/common.enum';
@@ -125,6 +125,11 @@ export class CarService {
 
 		return result[0];
 	}
+
+	public async getFavoriteProperties(memberId: ObjectId, input: OrdinaryInquiry): Promise<Cars> {
+		return await this.likeService.getFavoriteProperties(memberId, input);
+	}
+
 
 	private shapeMatchQuery(match: T, input: CarsInquiry): void {
 		const { memberId, locationList, typeList, yearList, brandList, pricesRange, mileageRange, options, text } =

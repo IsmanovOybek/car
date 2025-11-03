@@ -120,3 +120,12 @@ export const lookupFollowerData = {
 		as: 'followerData', // shu yerga datani yozadi
 	},
 };
+
+export const lookupFavorite = {
+	$lookup: {
+		from: 'members',
+		localField: 'favoriteProperty.memberId',
+		foreignField: '_id',
+		as: 'favoriteProperty.memberData',
+	},
+};

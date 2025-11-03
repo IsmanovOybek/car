@@ -59,7 +59,17 @@ export class CarResolver {
 		@AuthMember('_id') memberId: ObjectId,
 	): Promise<Cars> {
 		console.log('Query: getFavorites');
-		return await this.carService.getFavoriteProperties(memberId, input);
+		return await this.carService.getFavoriteCars(memberId, input);
+	}
+
+	@UseGuards(AuthGuard)
+	@Query((returns) => Cars)
+	public async getVisited(
+		@Args('input') input: OrdinaryInquiry,
+		@AuthMember('_id') memberId: ObjectId,
+	): Promise<Cars> {
+		console.log('Query: getVisited');
+		return await this.carService.getVisited(memberId, input);
 	}
 
 	@Roles(MemberType.AGENT)

@@ -40,7 +40,7 @@ export class LikeService {
 		return result ? [{ memberId: memberId, likeRefId: likeRefId, myFavorite: true }] : [];
 	}
 
-	public async getFavoriteProperties(memberId: ObjectId, input: OrdinaryInquiry): Promise<Cars> {
+	public async getFavoriteCars(memberId: ObjectId, input: OrdinaryInquiry): Promise<Cars> {
 		const { page, limit } = input;
 
 		const match: T = { likeGroup: LikeGroup.CAR, memberId: memberId };
@@ -54,17 +54,17 @@ export class LikeService {
 						from: 'cars',
 						localField: 'likeRefId',
 						foreignField: '_id',
-						as: 'favoriteProperty',
+						as: 'favoriteCar',
 					},
 				},
-				{ $unwind: '$favoriteProperty' },
+				{ $unwind: '$favoriteCar' },
 				{
 					$facet: {
 						list: [
 							{ $skip: (page - 1) * limit },
 							{ $limit: limit },
 							lookupFavorite,
-							{ $unwind: '$favoriteProperty.memberData' },
+							{ $unwind: '$favoriteCar.memberData' },
 						],
 						metaCounter: [{ $count: 'total' }],
 					},
@@ -73,7 +73,7 @@ export class LikeService {
 			.exec();
 
 		const result: Cars = { list: [], metaCounter: data[0].metaCounter };
-		result.list = data[0].list.map((ele) => ele.favoriteProperty);
+		result.list = data[0].list.map((ele) => ele.favoriteCar);
 
 		return result;
 	}

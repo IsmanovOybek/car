@@ -126,8 +126,12 @@ export class CarService {
 		return result[0];
 	}
 
-	public async getFavoriteProperties(memberId: ObjectId, input: OrdinaryInquiry): Promise<Cars> {
-		return await this.likeService.getFavoriteProperties(memberId, input);
+	public async getFavoriteCars(memberId: ObjectId, input: OrdinaryInquiry): Promise<Cars> {
+		return await this.likeService.getFavoriteCars(memberId, input);
+	}
+
+	public async getVisited(memberId: ObjectId, input: OrdinaryInquiry): Promise<Cars> {
+		return await this.likeService.getFavoriteCars(memberId, input);
 	}
 
 

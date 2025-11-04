@@ -13,7 +13,7 @@ export class CarBatchController {
 		this.logger.debug('BATCH SERVER READY!');
 	}
 
-	@Cron('00 00 * * * *', { name: BATCH_ROLLBACK })
+	@Cron('00 00 01 * * *', { name: BATCH_ROLLBACK })
 	public async batchRollback() {
 		try {
 			this.logger['context'] = BATCH_ROLLBACK;
@@ -24,23 +24,23 @@ export class CarBatchController {
 		}
 	}
 
-	@Cron('20 * * * * *', { name: BATCH_TOP_PROPERTIES })
+	@Cron('20 00 01 * * *', { name: BATCH_TOP_PROPERTIES })
 	public async batchProperties() {
 		try {
 			this.logger['context'] = BATCH_TOP_PROPERTIES;
 			this.logger.debug('EXECUTED!');
-			await this.carBatchService.batchProperties();
+			await this.carBatchService.batchTopProperties();
 		} catch (err) {
 			this.logger.error(err);
 		}
 	}
 
-	@Cron('20 * * * * *', { name: BATCH_TOP_AGENTS })
+	@Cron('20 00 01 * * *', { name: BATCH_TOP_AGENTS })
 	public async batchAgents() {
 		try {
 			this.logger['context'] = BATCH_TOP_AGENTS;
 			this.logger.debug('EXECUTED!');
-			await this.carBatchService.batchAgents();
+			await this.carBatchService.batchTopAgents();
 		} catch (err) {
 			this.logger.error(err);
 		}

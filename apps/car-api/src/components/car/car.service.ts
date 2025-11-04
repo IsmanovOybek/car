@@ -126,24 +126,15 @@ export class CarService {
 		return result[0];
 	}
 
-	public async getFavoriteCars(memberId: ObjectId, input: OrdinaryInquiry): Promise<Cars> {
-		return await this.likeService.getFavoriteCars(memberId, input);
-	}
-
-	public async getVisited(memberId: ObjectId, input: OrdinaryInquiry): Promise<Cars> {
-		return await this.likeService.getFavoriteCars(memberId, input);
-	}
-
-
 	private shapeMatchQuery(match: T, input: CarsInquiry): void {
 		const { memberId, locationList, typeList, yearList, brandList, pricesRange, mileageRange, options, text } =
 			input.search ?? {};
 
 		if (memberId) match.memberId = shapeIntoMongoObjectId(memberId);
-		if (locationList) match.carLocation = { $in: locationList };
-		if (yearList) match.carYears = { $in: yearList };
-		if (brandList) match.carBrand = { $in: brandList };
-		if (typeList) match.carType = { $in: typeList };
+		if (locationList && locationList.length) match.carLocation = { $in: locationList };
+		if (yearList && yearList.length) match.carYears = { $in: yearList };
+		if (brandList && brandList.length) match.carBrand = { $in: brandList };
+		if (typeList && typeList.length) match.carType = { $in: typeList };
 
 		if (pricesRange) match.carPrice = { $gte: pricesRange.start, $lte: pricesRange.end };
 		if (mileageRange) match.carMileage = { $gte: mileageRange.start, $lte: mileageRange.end };
@@ -154,6 +145,13 @@ export class CarService {
 				return { [ele]: true };
 			});
 		}
+	}
+	public async getFavoriteCars(memberId: ObjectId, input: OrdinaryInquiry): Promise<Cars> {
+		return await this.likeService.getFavoriteCars(memberId, input);
+	}
+
+	public async getVisited(memberId: ObjectId, input: OrdinaryInquiry): Promise<Cars> {
+		return await this.likeService.getFavoriteCars(memberId, input);
 	}
 
 	public async getAgentCars(memberId: ObjectId, input: AgentCarInquiry): Promise<Cars> {

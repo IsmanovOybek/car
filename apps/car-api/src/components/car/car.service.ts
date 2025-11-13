@@ -114,7 +114,12 @@ export class CarService {
 							{ $limit: input.limit },
 							lookupAuthMemberLiked(memberId),
 							lookupMember,
-							{ $unwind: '$memberData' },
+							{
+								$unwind: {
+									path: '$memberData',
+									preserveNullAndEmptyArrays: true,
+								},
+							},
 						],
 						metaCounter: [{ $count: 'total' }],
 					},
@@ -127,17 +132,46 @@ export class CarService {
 	}
 
 	private shapeMatchQuery(match: T, input: CarsInquiry): void {
-		const { memberId, locationList, typeList, yearList, brandList, pricesRange, mileageRange, options, text } =
-			input.search ?? {};
+		const {
+			memberId,
+			locationList,
+			typeList,
+			yearList,
+			brandList,
+			pricesRange,
+			mileageRange,
+			options,
+			text,
+			fuelTypeList,
+			transmissionList,
+			driverTypeList,
+			ownershipList,
+			colorList,
+			seatList,
+			doorList,
+			cylinderList,
+			featuresList,
+		} = input.search ?? {};
 
 		if (memberId) match.memberId = shapeIntoMongoObjectId(memberId);
 		if (locationList && locationList.length) match.carLocation = { $in: locationList };
-		if (yearList && yearList.length) match.carYears = { $in: yearList };
+		if (yearList && yearList.length) match.carYear = { $in: yearList };
 		if (brandList && brandList.length) match.carBrand = { $in: brandList };
 		if (typeList && typeList.length) match.carType = { $in: typeList };
 
 		if (pricesRange) match.carPrice = { $gte: pricesRange.start, $lte: pricesRange.end };
 		if (mileageRange) match.carMileage = { $gte: mileageRange.start, $lte: mileageRange.end };
+
+		// 🆕 Yangi filterlar (frontenddan keladiganlar)
+		if (fuelTypeList?.length) match.fuelType = { $in: fuelTypeList };
+		if (transmissionList?.length) match.carTransmission = { $in: transmissionList };
+		if (driverTypeList?.length) match.driverType = { $in: driverTypeList };
+		if (ownershipList?.length) match.ownership = { $in: ownershipList };
+		if (colorList?.length) match.carColor = { $in: colorList };
+		if (seatList?.length) match.carSeats = { $in: seatList };
+		if (doorList?.length) match.carDoors = { $in: doorList };
+		if (cylinderList?.length) match.cylinder = { $in: cylinderList };
+		if (featuresList?.length) match.features = { $all: featuresList };
 
 		if (text) match.carTitle = { $regex: new RegExp(text, 'i') };
 		if (options) {

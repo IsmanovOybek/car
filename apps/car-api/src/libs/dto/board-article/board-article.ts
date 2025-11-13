@@ -43,6 +43,7 @@ export class BoardArticle {
 	updatedAt: Date;
 
 	/** from aggregation **/
+
 	@Field(() => [MeLiked], { nullable: true })
 	meLiked?: MeLiked[];
 

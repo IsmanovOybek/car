@@ -1,7 +1,16 @@
 import { Field, InputType, Int } from '@nestjs/graphql';
 import { IsIn, IsInt, IsNotEmpty, IsOptional, Length, Min } from 'class-validator';
 import { ObjectId } from 'mongoose';
-import { CarBrand, CarLocation, CarStatus, CarType } from '../../enums/car.enum';
+import {
+	CarBrand,
+	CarLocation,
+	CarStatus,
+	Cartransmission,
+	CarType,
+	DriverType,
+	FuelType,
+	Ownership,
+} from '../../enums/car.enum';
 import { availableOptions, availablePropertySorts } from '../../types/config';
 import { Direction } from '../../enums/common.enum';
 
@@ -52,6 +61,39 @@ export class CarInput {
 	@IsNotEmpty()
 	@Field(() => [String])
 	carImages: string[];
+
+	// 🔋 Yoqilg‘i turi (Fuel type)
+	@IsOptional()
+	@Field(() => FuelType, { nullable: true })
+	fuelType?: FuelType;
+
+	@IsOptional()
+	@Field(() => Cartransmission, { nullable: true })
+	carTransmission?: Cartransmission;
+
+	@IsOptional()
+	@Field(() => DriverType, { nullable: true })
+	driverType?: DriverType;
+
+	@IsOptional()
+	@Field(() => Int, { nullable: true })
+	cylinder?: number;
+
+	@IsOptional()
+	@Field(() => String, { nullable: true })
+	carColor?: string;
+
+	@IsOptional()
+	@Field(() => Int, { nullable: true })
+	carDoors?: number;
+
+	@IsOptional()
+	@Field(() => Ownership, { nullable: true })
+	ownership?: Ownership;
+
+	@IsOptional()
+	@Field(() => [String], { nullable: true })
+	features?: string[];
 
 	@IsOptional()
 	@Length(5, 500)
@@ -130,6 +172,42 @@ class PISearch {
 	@IsOptional()
 	@Field(() => String, { nullable: true })
 	text?: string;
+
+	@IsOptional()
+	@Field(() => [FuelType], { nullable: true })
+	fuelTypeList?: FuelType[];
+
+	@IsOptional()
+	@Field(() => [Cartransmission], { nullable: true })
+	transmissionList?: Cartransmission[];
+
+	@IsOptional()
+	@Field(() => [DriverType], { nullable: true })
+	driverTypeList?: DriverType[];
+
+	@IsOptional()
+	@Field(() => [Ownership], { nullable: true })
+	ownershipList?: Ownership[];
+
+	@IsOptional()
+	@Field(() => [String], { nullable: true })
+	colorList?: string[];
+
+	@IsOptional()
+	@Field(() => [Int], { nullable: true })
+	seatList?: number[];
+
+	@IsOptional()
+	@Field(() => [Int], { nullable: true })
+	doorList?: number[];
+
+	@IsOptional()
+	@Field(() => [Int], { nullable: true })
+	cylinderList?: number[];
+
+	@IsOptional()
+	@Field(() => [String], { nullable: true })
+	featuresList?: string[];
 }
 @InputType()
 export class CarsInquiry {

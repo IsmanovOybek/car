@@ -59,7 +59,7 @@ export class BoardArticleResolver {
 		@AuthMember('_id') memberId: ObjectId,
 	): Promise<BoardArticles> {
 		console.log('Query: getBoardArticles');
-		return await this.boardArticleService.getBoardArticles(memberId, input);
+		return await this.boardArticleService.getBoardArticles(memberId, input); //cal
 	}
 
 	@UseGuards(AuthGuard)

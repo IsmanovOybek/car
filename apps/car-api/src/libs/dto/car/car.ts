@@ -1,7 +1,16 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
 import { ObjectId } from 'mongoose';
+import {
+	CarBrand,
+	CarLocation,
+	CarStatus,
+	CarType,
+	FuelType,
+	DriverType,
+	Ownership,
+	Cartransmission,
+} from '../../enums/car.enum';
 import { Member, TotalCounter } from '../member/member';
-import { CarBrand, CarLocation, CarStatus, CarType } from '../../enums/car.enum';
 import { MeLiked } from '../like/like';
 
 @ObjectType()
@@ -60,6 +69,32 @@ export class Car {
 	@Field(() => String)
 	memberId: ObjectId;
 
+	// 🆕 Qo‘shimcha field’lar (frontend filterlariga mos)
+	@Field(() => FuelType, { nullable: true })
+	fuelType?: FuelType;
+
+	@Field(() => Cartransmission, { nullable: true })
+	carTransmission?: Cartransmission;
+
+	@Field(() => DriverType, { nullable: true })
+	driverType?: DriverType;
+
+	@Field(() => Ownership, { nullable: true })
+	ownership?: Ownership;
+
+	@Field(() => String, { nullable: true })
+	carColor?: string;
+
+	@Field(() => Int, { nullable: true })
+	carDoors?: number;
+
+	@Field(() => Int, { nullable: true })
+	cylinder?: number;
+
+	@Field(() => [String], { nullable: true })
+	features?: string[];
+
+	// 🕒 vaqt maydonlari
 	@Field(() => Date, { nullable: true })
 	soldAt?: Date;
 
@@ -75,7 +110,7 @@ export class Car {
 	@Field(() => Date)
 	updatedAt: Date;
 
-	/** Form aggregation */
+	/** 🔗 Aggregation relations */
 	@Field(() => [MeLiked], { nullable: true })
 	meLiked?: MeLiked[];
 

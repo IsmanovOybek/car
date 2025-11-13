@@ -1,5 +1,5 @@
 import { Schema } from 'mongoose';
-import { CarBrand, CarLocation, CarStatus, CarType } from '../libs/enums/car.enum';
+import { CarBrand, CarLocation, CarStatus, CarType, DriverType, FuelType, Ownership } from '../libs/enums/car.enum';
 
 const CarSchema = new Schema(
 	{
@@ -100,6 +100,47 @@ const CarSchema = new Schema(
 			required: true,
 			ref: 'Member',
 		},
+		// YANGILIK
+
+		fuelType: {
+			type: String,
+			enum: FuelType,
+			required: true,
+			default: FuelType.PETROL,
+		},
+
+		driverType: {
+			type: String,
+			enum: DriverType,
+			default: DriverType.FWD,
+		},
+
+		cylinder: {
+			type: Number,
+			default: 4,
+		},
+
+		carColor: {
+			type: String,
+			default: 'WHITE',
+		},
+
+		carDoors: {
+			type: Number,
+			default: 4,
+		},
+
+		ownership: {
+			type: String,
+			enum: Ownership,
+			default: Ownership.FIRST,
+		},
+
+		features: {
+			type: [String],
+			default: [],
+		},
+		// JDHJDBVJD
 
 		soldAt: {
 			type: Date,

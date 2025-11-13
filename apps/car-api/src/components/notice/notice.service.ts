@@ -53,12 +53,27 @@ export class NoticeService {
 		}
 	}
 
-	 public async getNotices(input: NoticeCategory): Promise<Notice[]> {
+	public async getNotices(input: NoticeCategory): Promise<Notice[]> {
 		return await this.noticeModel
 			.find({
 				noticeCategory: input,
 				noticeStatus: NoticeStatus.ACTIVE,
 			})
 			.sort({ createdAt: -1 });
+	}
+
+	public async deleteNotice(noticeId: ObjectId): Promise<Notice> {
+		try {
+			const exist = await this.noticeModel.findById(noticeId);
+			if (!exist) {
+				throw new BadRequestException('Notice not found');
+			}
+
+			const result = await this.noticeModel.findByIdAndDelete(noticeId);
+
+			return result;
+		} catch (err) {
+			throw new BadRequestException(Message.REMOVE_FAILED);
+		}
 	}
 }

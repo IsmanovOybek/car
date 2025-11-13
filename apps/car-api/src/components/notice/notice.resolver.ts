@@ -12,6 +12,7 @@ import { AuthService } from '../auth/auth.service';
 import { UpdateNoticeInput } from '../../libs/dto/notice/notice.update';
 import { NoticeCategory } from '../../libs/enums/notice.enum';
 import { WithoutGuard } from '../auth/guards/without.guard';
+import { shapeIntoMongoObjectId } from '../../libs/types/config';
 
 @Resolver()
 export class NoticeResolver {
@@ -46,5 +47,16 @@ export class NoticeResolver {
 	public async getNotices(@Args('input', { type: () => NoticeCategory }) input: NoticeCategory): Promise<Notice[]> {
 		console.log('Query: getNoticeList');
 		return await this.noticeService.getNotices(input);
+	}
+
+	@Roles(MemberType.ADMIN)
+	@UseGuards(RolesGuard)
+	@Mutation(() => Notice)
+	public async deleteNotice(
+		@Args('noticeId') input: string,
+	): Promise<Notice> {
+		console.log('Mutation: deleteNotice');
+		const noticeId = shapeIntoMongoObjectId(input);
+		return await this.noticeService.deleteNotice( noticeId);
 	}
 }

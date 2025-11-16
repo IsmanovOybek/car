@@ -2,7 +2,7 @@ import { registerEnumType } from '@nestjs/graphql';
 
 export enum ReviewGroup {
 	CAR = 'CAR',
-	MEMBER = 'MEMBER',
+	ARTICLE = 'ARTICLE',
     AGENT = "AGENT",
 }
 registerEnumType(ReviewGroup, {

@@ -22,9 +22,10 @@ const NoticeSchema = new Schema(
 
 		noticeContent: {
 			type: String,
-			required: true,
+			required: false,
+			default: '',
 		},
-		
+
 		memberId: {
 			type: Schema.Types.ObjectId,
 			required: true,

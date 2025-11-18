@@ -9,8 +9,9 @@ import { LikeModule } from './like/like.module';
 import { ReviewModule } from './review/review.module';
 import { FollowModule } from './follow/follow.module';
 import { NoticeModule } from './notice/notice.module';
+import { AiModule } from './ai/ai.module';
 
 @Module({
-	imports: [MemberModule, CarModule, AuthModule, ViewModule, BoardArticleModule, CommentModule, LikeModule, ReviewModule, FollowModule, NoticeModule],
+	imports: [MemberModule, CarModule, AuthModule, ViewModule, BoardArticleModule, CommentModule, LikeModule, ReviewModule, FollowModule, NoticeModule, AiModule],
 })
 export class ComponentsModule {}

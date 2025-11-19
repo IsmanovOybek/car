@@ -22,6 +22,9 @@ export class BoardArticle {
 	articleContent: string;
 
 	@Field(() => String, { nullable: true })
+	articleDesc?: string;
+
+	@Field(() => String, { nullable: true })
 	articleImage?: string;
 
 	@Field(() => Int)

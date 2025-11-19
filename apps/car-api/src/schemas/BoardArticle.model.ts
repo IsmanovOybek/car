@@ -25,6 +25,10 @@ const BoardArticleSchema = new Schema(
 			required: true,
 		},
 
+		articleDesc: {
+			type: String,
+		},
+
 		articleImage: {
 			type: String,
 		},

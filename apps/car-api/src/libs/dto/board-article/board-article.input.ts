@@ -12,14 +12,19 @@ export class BoardArticleInput {
 	articleCategory: BoardArticleCategory;
 
 	@IsNotEmpty()
-	@Length(3, 50)
+	@Length(3, 350)
 	@Field(() => String)
 	articleTitle: string;
 
 	@IsNotEmpty()
-	@Length(3, 250)
+	@Length(3, 350)
 	@Field(() => String)
 	articleContent: string;
+
+	@IsOptional()
+	@Length(0, 350)
+	@Field(() => String, { nullable: true })
+	articleDesc?: string;
 
 	@IsOptional()
 	@Field(() => String, { nullable: true })

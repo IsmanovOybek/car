@@ -14,14 +14,19 @@ export class BoardArticleUpdate {
 	articleStatus?: BoardArticleStatus;
 
 	@IsOptional()
-	@Length(3, 50)
+	@Length(3, 350)
 	@Field(() => String, { nullable: true })
 	articleTitle?: string;
 
 	@IsOptional()
-	@Length(3, 250)
+	@Length(3, 350)
 	@Field(() => String, { nullable: true })
 	articleContent?: string;
+
+	@IsOptional()
+	@Length(0, 350)
+	@Field(() => String, { nullable: true })
+	articleDesc?: string;
 
 	@IsOptional()
 	@Field(() => String, { nullable: true })

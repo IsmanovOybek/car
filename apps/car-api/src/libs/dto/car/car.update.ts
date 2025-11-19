@@ -1,7 +1,16 @@
 import { Field, InputType, Int } from '@nestjs/graphql';
 import { IsInt, IsNotEmpty, IsOptional, Length, Min } from 'class-validator';
 import type { ObjectId } from 'mongoose';
-import { CarBrand, CarLocation, CarStatus, CarType } from '../../enums/car.enum';
+import {
+	CarBrand,
+	CarLocation,
+	CarStatus,
+	CarType,
+	Cartransmission,
+	DriverType,
+	FuelType,
+	Ownership,
+} from '../../enums/car.enum';
 
 @InputType()
 export class CarUpdate {
@@ -76,10 +85,54 @@ export class CarUpdate {
 	@Field(() => String, { nullable: true })
 	carDesc?: string;
 
+	// 🔋 Yoqilg'i turi (Fuel type)
+	@IsOptional()
+	@Field(() => FuelType, { nullable: true })
+	fuelType?: FuelType;
+
+	// ⚙️ Transmission (Avtomatik yoki Mexanik)
+	@IsOptional()
+	@Field(() => Cartransmission, { nullable: true })
+	carTransmission?: Cartransmission;
+
+	// 🚗 Driver type (FWD, RWD, AWD, 4WD)
+	@IsOptional()
+	@Field(() => DriverType, { nullable: true })
+	driverType?: DriverType;
+
+	// 🔢 Silindrlar soni
+	@IsOptional()
+	@IsInt()
+	@Min(1)
+	@Field(() => Int, { nullable: true })
+	cylinder?: number;
+
+	// 🎨 Rangi
+	@IsOptional()
+	@Field(() => String, { nullable: true })
+	carColor?: string;
+
+	// 🚪 Eshiklar soni
+	@IsOptional()
+	@IsInt()
+	@Min(1)
+	@Field(() => Int, { nullable: true })
+	carDoors?: number;
+
+	// 👤 Egalik tartibi (Birinchi, Ikkinchi, Uchinchi yoki ko'p)
+	@IsOptional()
+	@Field(() => Ownership, { nullable: true })
+	ownership?: Ownership;
+
+	// ✨ Xususiyatlar (Features) - A/C, Backup Camera, Navigation va h.k.
+	@IsOptional()
+	@Field(() => [String], { nullable: true })
+	features?: string[];
+
 	// Sotilgan sana
 	soldAt?: Date;
 
-	// O‘chirilgan sana
+	// O'chirilgan sana
 	deletedAt?: Date;
 
 	// Qurilgan sana

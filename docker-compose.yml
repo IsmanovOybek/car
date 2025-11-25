@@ -17,7 +17,7 @@ services:
 
   car-batch:
     container_name: car-batch
-    restart: always
+    restart: unless-stopped
     image: node:20.10.0
     ports:
       - 4002:3009

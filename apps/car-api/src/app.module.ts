@@ -9,6 +9,8 @@ import { DatabaseModule } from './database/database.module';
 import { ComponentsModule } from './components/components.module';
 import { T } from './libs/types/common';
 import { SocketModule } from './socket/socket.module';
+// @ts-ignore - graphql-upload uses CommonJS module.exports
+const GraphQLUpload = require('graphql-upload/GraphQLUpload.js');
 
 @Module({
 	imports: [
@@ -18,6 +20,9 @@ import { SocketModule } from './socket/socket.module';
 			playground: true,
 			uploads: false,
 			autoSchemaFile: true,
+			resolvers: {
+				Upload: GraphQLUpload,
+			},
 			formatError: (error: T) => {
 				console.log('errror=>', error);
 				const graphQLFormatError = {

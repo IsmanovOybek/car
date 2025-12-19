@@ -12,7 +12,15 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { MemberUpdate } from '../../libs/dto/member/member.update';
 import { getSerialForImage, shapeIntoMongoObjectId, validMimeTypes } from '../../libs/types/config';
 import { WithoutGuard } from '../auth/guards/without.guard';
-import { GraphQLUpload, FileUpload } from 'graphql-upload';
+// @ts-ignore - graphql-upload uses CommonJS module.exports
+const GraphQLUpload = require('graphql-upload/GraphQLUpload.js');
+
+interface FileUpload {
+	createReadStream: () => NodeJS.ReadableStream;
+	filename: string;
+	mimetype: string;
+	encoding: string;
+}
 import { Message } from '../../libs/enums/common.enum';
 import { createWriteStream } from 'fs';
 

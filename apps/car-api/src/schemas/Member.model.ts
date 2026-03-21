@@ -18,10 +18,18 @@ const MemberSchema = new Schema(
 			enum: MemberAuthType,
 			default: MemberAuthType.PHONE,
 		},
+		googleId: {
+			type: String,
+			index: { unique: true, sparse: true },
+		},
+		memberEmail: {
+			type: String,
+			index: { unique: true, sparse: true },
+		},
 		memberPhone: {
 			type: String,
 			index: { unique: true, sparse: true },
-			required: true,
+			required: false,
 			match: [
 				/^(\+82|0?10)[0-9]{7,8}$|^(\+998)[0-9]{9}$|^(\+1)[0-9]{10}$/,
 				'Invalid phone format (only KR, UZ, US allowed)',
@@ -50,7 +58,7 @@ const MemberSchema = new Schema(
 		memberPassword: {
 			type: String,
 			select: false,
-			required: true,
+			required: false,
 		},
 		memberFullName: {
 			type: String,
